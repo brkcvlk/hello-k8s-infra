@@ -1,0 +1,6 @@
+bucket         = "REPLACE_ME_tfstate_bucket"
+key            = "hello-k8s/platform/terraform.tfstate"
+region         = "eu-central-1"
+use_lockfile   = true
+encrypt        = true
+
