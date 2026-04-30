@@ -8,20 +8,20 @@ BACKEND_FILE  := backend.hcl
 # Bootstrap
 
 bootstrap:
-	@echo "==> Initializing bootstrap"
+	@echo "Initializing bootstrap"
 	cd $(BOOTSTRAP_DIR) && terraform init
-	@echo "==> Applying bootstrap (S3 + DynamoDB)"
+	@echo "Applying bootstrap (S3 + DynamoDB)"
 	cd $(BOOTSTRAP_DIR) && terraform apply -auto-approve
-	@echo "==> Bootstrap complete. Dont forget to fill in $(BACKEND_FILE)"
+	@echo "Bootstrap complete. Dont forget to fill in $(BACKEND_FILE)"
 
 bootstrap-destroy:
-	@echo "==> Destroying bootstrap resources"
+	@echo "Destroying bootstrap resources"
 	cd $(BOOTSTRAP_DIR) && terraform destroy
 
 # Infra
 
 init:
-	@echo "==> Initializing infra backend"
+	@echo "Initializing infra backend"
 	cd $(INFRA_DIR) && terraform init -backend-config=../$(BACKEND_FILE)
 
 plan:
