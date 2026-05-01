@@ -16,115 +16,43 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  fmt:
-    name: Format Check
+  terraform:
+    name: Terraform Workflow
     runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
+    
+    env:
+      BACKEND_HCL_CONTENT: ${{ secrets.BACKEND_HCL }}
 
-      - uses: hashicorp/setup-terraform@v3
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
         with:
           terraform_wrapper: false
 
-      - name: terraform fmt check
+      - name: Create Backend Config
+        run: echo "$BACKEND_HCL_CONTENT" > backend.hcl
+
+      - name: Terraform Format Check
         run: make fmt-check
 
-  validate:
-    name: Validate
-    runs-on: ubuntu-latest
-    needs: fmt
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ secrets.AWS_REGION }}
-
-      - uses: hashicorp/setup-terraform@v3
-        with:
-          terraform_wrapper: false
-
-      - name: Copy backend config
-        env:
-          BACKEND_HCL: ${{ secrets.BACKEND_HCL }}
-        run: echo "$BACKEND_HCL" > backend.hcl
-
-      - name: terraform init
+      - name: Terraform Init
         run: make init
 
-      - name: terraform validate
+      - name: Terraform Validate
         run: make validate
 
-  plan:
-    name: Plan
-    runs-on: ubuntu-latest
-    needs: validate
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ secrets.AWS_REGION }}
-
-      - uses: hashicorp/setup-terraform@v3
-        with:
-          terraform_wrapper: false
-
-      - name: Copy backend config
-        env:
-          BACKEND_HCL: ${{ secrets.BACKEND_HCL }}
-        run: echo "$BACKEND_HCL" > backend.hcl
-
-      - name: terraform init
-        run: make init
-
-      - name: terraform plan
+      - name: Terraform Plan
         run: make plan
 
-      - name: Upload plan artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: tfplan
-          path: infra/tfplan
-          retention-days: 1
-
-  apply:
-    name: Apply
-    runs-on: ubuntu-latest
-    needs: plan
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ secrets.AWS_REGION }}
-
-      - uses: hashicorp/setup-terraform@v3
-        with:
-          terraform_wrapper: false
-
-      - name: Copy backend config
-        env:
-          BACKEND_HCL: ${{ secrets.BACKEND_HCL }}
-        run: echo "$BACKEND_HCL" > backend.hcl
-
-      - name: terraform init
-        run: make init
-
-      - name: Download plan artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: tfplan
-          path: infra/
-
-      - name: terraform apply
+      - name: Terraform Apply
         run: make apply
