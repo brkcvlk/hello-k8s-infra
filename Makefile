@@ -1,5 +1,5 @@
 export AWS_PROFILE := terraform
-.PHONY: bootstrap bootstrap-destroy init plan apply destroy fmt validate
+.PHONY: bootstrap bootstrap-destroy init plan apply destroy fmt fmt-check validate
 
 BOOTSTRAP_DIR := bootstrap
 INFRA_DIR     := infra
