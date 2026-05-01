@@ -48,7 +48,9 @@ jobs:
           terraform_wrapper: false
 
       - name: Copy backend config
-        run: echo "${{ secrets.BACKEND_HCL }}" > backend.hcl
+        env:
+          BACKEND_HCL: ${{ secrets.BACKEND_HCL }}
+        run: echo "$BACKEND_HCL" > backend.hcl
 
       - name: terraform init
         run: make init
@@ -75,7 +77,9 @@ jobs:
           terraform_wrapper: false
 
       - name: Copy backend config
-        run: echo "${{ secrets.BACKEND_HCL }}" > backend.hcl
+        env:
+          BACKEND_HCL: ${{ secrets.BACKEND_HCL }}
+        run: echo "$BACKEND_HCL" > backend.hcl
 
       - name: terraform init
         run: make init
@@ -109,7 +113,9 @@ jobs:
           terraform_wrapper: false
 
       - name: Copy backend config
-        run: echo "${{ secrets.BACKEND_HCL }}" > backend.hcl
+        env:
+          BACKEND_HCL: ${{ secrets.BACKEND_HCL }}
+        run: echo "$BACKEND_HCL" > backend.hcl
 
       - name: terraform init
         run: make init
