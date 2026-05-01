@@ -17,7 +17,7 @@ concurrency:
 
 jobs:
   terraform:
-    name: Terraform Workflow
+    name: apply
     runs-on: ubuntu-latest
     
     env:
