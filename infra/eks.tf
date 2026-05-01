@@ -5,7 +5,6 @@ module "eks" {
   name               = var.cluster_name
   kubernetes_version = "1.33"
 
-  # EKS Addons
   addons = {
     coredns = {}
     eks-pod-identity-agent = {
